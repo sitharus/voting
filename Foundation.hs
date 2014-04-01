@@ -4,6 +4,7 @@ import Prelude
 import Yesod
 import Yesod.Static
 import Yesod.Auth
+import Yesod.Auth.Dummy
 import Yesod.Auth.BrowserId
 import Yesod.Auth.GoogleEmail
 import Yesod.Default.Config
@@ -115,7 +116,7 @@ instance YesodPersistRunner App where
     getDBRunner = defaultGetDBRunner connPool
 
 instance YesodAuth App where
-    type AuthId App = UserId
+    type AuthId App = VoterId
 
     -- Where to send a user after successful login
     loginDest _ = HomeR
@@ -123,17 +124,14 @@ instance YesodAuth App where
     logoutDest _ = HomeR
 
     getAuthId creds = runDB $ do
-        x <- getBy $ UniqueUser $ credsIdent creds
+        x <- getBy $ UniqueVoter $ credsIdent creds
         case x of
             Just (Entity uid _) -> return $ Just uid
             Nothing -> do
-                fmap Just $ insert User
-                    { userIdent = credsIdent creds
-                    , userPassword = Nothing
-                    }
+                fmap Just $ insert $ Voter (credsIdent creds) Nothing
 
     -- You can add other plugins like BrowserID, email or OAuth here
-    authPlugins _ = [authBrowserId def, authGoogleEmail]
+    authPlugins _ = [authDummy]
 
     authHttpManager = httpManager
 

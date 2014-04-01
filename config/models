@@ -1,12 +1,24 @@
-User
-    ident Text
-    password Text Maybe
-    UniqueUser ident
-    deriving Typeable
-Email
-    email Text
-    user UserId Maybe
-    verkey Text Maybe
-    UniqueEmail email
+Voter
+        ident Text
+        voterRegion RegionId Maybe
+        UniqueVoter ident
+        deriving Show Typeable
+
+Region
+        name Text
+        UniqueRegionName name
+        deriving Show
+
+VoteOption
+        regionId RegionId Eq
+        name Text
+        UniqueOptionName regionId name
+        deriving Show
+
+Vote
+        voterId VoterId Eq
+        voteOptionId VoteOptionId Eq
+        rank Int
+        deriving Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)
