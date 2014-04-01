@@ -1,0 +1,24 @@
+Default: &defaults
+  user: voting
+  password: voting
+  host: localhost
+  port: 5432
+  database: voting
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: voting_test
+  <<: *defaults
+
+Staging:
+  database: voting_staging
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: voting_production
+  poolsize: 100
+  <<: *defaults
