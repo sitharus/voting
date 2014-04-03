@@ -1,12 +1,16 @@
 <section>
   <h1>Voting
 
-  <ul id="allvotes" class="votelist">
-    $forall (Entity (Key (PersistInt64 optionId)) (VoteOption _ name)) <- allOptions
-      <li data-option-id=#{show optionId}>#{name}
+  <section class="voteselection">
+    <div class="leftvotes votes">
+      <h1>Unranked
+      <ul id="allvotes" class="votelist">
+        $forall (Entity (Key (PersistInt64 optionId)) (VoteOption _ name)) <- allOptions
+          <li data-option-id=#{show optionId}>#{name}
 
-  <h1> Your Votes
-  <ul id="currentvotes" class="votelist">
-    $forall (Entity voteId (Vote _ _ rank)) <- votes
-      <li>#{show rank}
- 
+    <div class="rightvotes votes">
+      <h1>Votes
+      <ul id="currentvotes" class="votelist">
+        $forall (Entity voteId (Vote _ _ rank)) <- votes
+          <li>#{show rank}
+  <input type="button" id="save-votes" value="Save Votes">
