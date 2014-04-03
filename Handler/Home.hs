@@ -2,6 +2,7 @@
 module Handler.Home where
 
 import Import
+import Yesod.Auth (maybeAuthId)
 
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
@@ -12,28 +13,51 @@ import Import
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler Html
 getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe (FileInfo, Text)
-        handlerName = "getHomeR" :: Text
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+  authId <- maybeAuthId
+  case authId of
+    Just user -> votingPage user
+    Nothing -> 
+        defaultLayout $ do
+                setTitle "Welcome to Voting!"
+                $(widgetFile "homepage")
 
-postHomeR :: Handler Html
-postHomeR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postHomeR" :: Text
-        submission = case result of
-            FormSuccess res -> Just res
-            _ -> Nothing
+regionOptions r =
+        selectList [VoteOptionRegionId ==. r] []
 
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+votingForm :: VoterId -> Voter -> Widget
+votingForm voterId voter = do
+  voterRegion <- return $ voterVoterRegion voter
+  case voterRegion of
+    Just v -> do
+      allOptions <- handlerToWidget $ runDB $ selectList [VoteOptionRegionId ==. v] []
+      votes <- handlerToWidget $ runDB $ selectList [VoteVoterId ==. voterId] []
+      $(widgetFile "voteForm")
+    Nothing -> [whamlet|Set your region above|]
 
-sampleForm :: Form (FileInfo, Text)
-sampleForm = renderDivs $ (,)
-    <$> fileAFormReq "Choose a file"
-    <*> areq textField "What's on the file?" Nothing
+votingPage :: VoterId -> Handler Html
+votingPage v = do
+  Just voter <- runDB $ get v
+  (widget, enctype) <- generateFormPost $ regionSelector voter
+  options <- case voterVoterRegion voter of
+               Just region -> runDB $ regionOptions region
+               Nothing -> return $ []
+  votingForm <- return $ votingForm v voter
+  defaultLayout $ do
+                 setTitle "Cast your vote!"
+                 $(widgetFile "voting")
+
+postSaveRegionR :: Handler Html
+postSaveRegionR = do
+  Just authId <- maybeAuthId
+  Just voter <- runDB $ get authId
+  ((result, widget), enctype) <- runFormPost $ regionSelector voter
+  case result of
+    FormSuccess regionId -> runDB $ update authId [VoterVoterRegion =. Just regionId]
+    _ -> error "Form failed"
+  redirect HomeR
+
+regionSelector :: Voter -> Form RegionId
+regionSelector r = 
+    let options = selectField $ optionsPersistKey ([] :: [Filter Region]) [] regionName
+        field = areq options "" (voterVoterRegion r)
+    in renderDivs field 

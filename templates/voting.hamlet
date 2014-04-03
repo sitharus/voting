@@ -1,0 +1,6 @@
+<h1>Your Region
+<form enctype=#{enctype} action=@{SaveRegionR} method=POST>
+    ^{widget}
+    <input type="submit" value="Save">
+
+^{votingForm}

@@ -20,6 +20,7 @@ import Model
 import Text.Jasmine (minifym)
 import Text.Hamlet (hamletFile)
 import Yesod.Core.Types (Logger)
+import Control.Applicative
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -48,6 +49,7 @@ mkYesodData "App" $(parseRoutesFile "config/routes")
 
 type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
 
+
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
 instance Yesod App where
@@ -62,6 +64,10 @@ instance Yesod App where
     defaultLayout widget = do
         master <- getYesod
         mmsg <- getMessage
+        voterId <- maybeAuthId
+        voter <- case voterId of
+                   Just userId -> runDB $ get userId
+                   Nothing -> return Nothing
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
@@ -73,6 +79,7 @@ instance Yesod App where
             $(combineStylesheets 'StaticR
                 [ css_normalize_css
                 , css_bootstrap_css
+                , css_screen_css
                 ])
             $(widgetFile "default-layout")
         giveUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
@@ -107,6 +114,14 @@ instance Yesod App where
         development || level == LevelWarn || level == LevelError
 
     makeLogger = return . appLogger
+
+    isAuthorized HomeR _ = return Authorized
+    isAuthorized (AuthR _) _ = return Authorized
+    isAuthorized _ _ = do
+                     mu <- maybeAuthId
+                     return $ case mu of
+                                Nothing -> AuthenticationRequired
+                                Just _ -> Authorized
 
 -- How to run database actions.
 instance YesodPersist App where

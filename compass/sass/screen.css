@@ -1,0 +1,49 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+nav {
+  background: #425580; }
+  nav ul {
+    padding: 0;
+    margin: 0; }
+  nav li {
+    display: inline;
+    line-height: 20px;
+    list-style: none; }
+    nav li a {
+      display: inline-block;
+      padding: 4px;
+      border-right: 1px solid #7DB171;
+      color: #CBD4F9;
+      font-weight: bold; }
+      nav li a:link {
+        color: #CBD4F9;
+        font-weight: bold; }
+      nav li a:hover {
+        color: #CBD4F9;
+        font-weight: bold; }
+      nav li a:visited {
+        color: #CBD4F9;
+        font-weight: bold; }
+
+header {
+  background: #7DB171; }
+  header h1 {
+    padding: 0.5em;
+    margin: 0;
+    color: #21202C;
+    font-size: 220%; }
+
+section h1 {
+  font-size: 180%;
+  padding: 0;
+  margin-bottom: 0.4em; }
+
+ul.votelist li {
+  list-style: none;
+  border: 1px solid #21202C;
+  background: #CBD4F9;
+  width: 250px;
+  padding: 5px;
+  margin: 4px 0; }

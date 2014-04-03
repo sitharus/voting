@@ -1,0 +1,10 @@
+<h1>Regions
+<ul>
+$forall Entity regionId (Region name) <- regions
+  <li>#{name} 
+    <a href=@{RegionOptionsR regionId}>Set Options
+
+<h1>New Region
+<form action=@{RegionR} method=POST enctype=#{regionEnc}>
+  ^{regionWidget}
+  <input type="submit" value="Save">

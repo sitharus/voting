@@ -1,0 +1,10 @@
+<h1> #{regionName region}
+
+<ul>
+$forall Entity optionId (VoteOption _ name) <- options
+  <li>#{name}
+
+
+<form action=@{RegionOptionsR regionId} encoding=#{enctype} method=POST>
+  ^{widget}
+  <input type="submit" value="Add">

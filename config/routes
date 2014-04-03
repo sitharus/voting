@@ -4,4 +4,9 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET POST
+/ HomeR GET
+/region/save SaveRegionR POST
+
+/admin AdminR GET
+/admin/region RegionR POST
+/admin/region/#RegionId/options RegionOptionsR GET POST
